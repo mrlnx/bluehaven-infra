@@ -65,7 +65,7 @@ resource "google_cloud_run_service" "default" {
 
 
 module "vpc_connector" {
-  source        = "../vpc-connector"
+  source        = "../vpc_connector"
   name_prefix   = var.name_prefix
   region        = var.region
   ip_cidr_range = var.ip_range_vpc_connector
