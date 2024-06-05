@@ -22,7 +22,7 @@ module "backend_artifact_repository" {
 }
 
 module "vpc_network" {
-  source        = "../../modules/vpc-network"
+  source        = "../../modules/vpc_network"
   name_prefix   = var.environment
   region        = var.region
   ip_cidr_range = "10.0.0.0/16"
@@ -30,7 +30,7 @@ module "vpc_network" {
 }
 
 module "frontend_service" {
-  source                                   = "../../modules/frontend-service"
+  source                                   = "../../modules/frontend_service"
   name_prefix                              = "fe-svc-${var.environment}"
   region                                   = var.region
   project_id                               = var.project_id
@@ -57,7 +57,7 @@ module "frontend_service" {
 }
 
 module "backend_service" {
-  source                 = "../../modules/api-service"
+  source                 = "../../modules/api_service"
   name_prefix            = "be-svc-${var.environment}"
   region                 = var.region
   project_id             = var.project_id
