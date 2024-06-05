@@ -1,12 +1,12 @@
 resource "google_compute_global_address" "load_balancer" {
-  name         = "${var.name_prefix}-fe-load-balancer"
+  name         = "${var.name_prefix}-loadbalancer"
   project      = var.project_id
   address_type = "EXTERNAL" # check if we can add a fixed ip
   count        = var.environment == "prod" ? 1 : 0
 }
 
 resource "google_compute_url_map" "load_balancer_http" {
-  name    = "${var.name_prefix}-fe-http"
+  name    = "${var.name_prefix}-http"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -18,7 +18,7 @@ resource "google_compute_url_map" "load_balancer_http" {
   }
 }
 resource "google_compute_url_map" "load_balancer_https" {
-  name    = "${var.name_prefix}-fe-https"
+  name    = "${var.name_prefix}-https"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -26,7 +26,7 @@ resource "google_compute_url_map" "load_balancer_https" {
 }
 
 resource "google_compute_target_http_proxy" "http_proxy" {
-  name    = "fe-http-proxy"
+  name    = "${var.name_prefix}-http-proxy"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -35,7 +35,7 @@ resource "google_compute_target_http_proxy" "http_proxy" {
 }
 
 resource "google_compute_global_forwarding_rule" "load_balancer_http" {
-  name    = "forwarding-http"
+  name    = "${var.name_prefix}-forwarding-http"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -45,7 +45,7 @@ resource "google_compute_global_forwarding_rule" "load_balancer_http" {
 }
 
 resource "google_compute_target_https_proxy" "https_proxy" {
-  name    = "fe-https-proxy"
+  name    = "${var.name_prefix}-https-proxy"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -55,7 +55,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
 }
 
 resource "google_compute_global_forwarding_rule" "load_balancer_https" {
-  name    = "forwarding-https"
+  name    = "${var.name_prefix}-forwarding-https"
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
@@ -73,13 +73,12 @@ resource "google_compute_backend_service" "load_balancer" {
   # security_policy = local.create_security_policy ? google_compute_security_policy.frontend_ip_policy[0].name : null
 
   backend {
-    # group = google_compute_region_network_endpoint_group.frontend_neg.id
     group = google_compute_region_network_endpoint_group.frontend_neg[0].self_link
   }
 }
 
 resource "google_compute_region_network_endpoint_group" "frontend_neg" {
-  name                  = "cloud-run-neg"
+  name                  = "${var.name_prefix}-run-neg"
   project               = var.project_id
   network_endpoint_type = "SERVERLESS"
   region                = var.region
@@ -87,5 +86,9 @@ resource "google_compute_region_network_endpoint_group" "frontend_neg" {
 
   cloud_run {
     service = var.service.name
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
