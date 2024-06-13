@@ -1,3 +1,0 @@
-bucket                      = "bluehaven-infra-modules-tf-state"
-prefix                      = "static.tfstate.d"
-impersonate_service_account = "bluehaven-infra-modules-tf-sa@bluehaven-infra-modules.iam.gserviceaccount.com"

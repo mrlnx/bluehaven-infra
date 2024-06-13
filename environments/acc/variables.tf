@@ -16,7 +16,6 @@ variable "project_id" {
 
 variable "environment" {
   description = "Environment"
-  default     = "prod"
 }
 
 variable "project_number" {

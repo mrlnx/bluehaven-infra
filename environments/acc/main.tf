@@ -25,7 +25,7 @@ module "vpc_network" {
   source        = "../../modules/vpc_network"
   name_prefix   = var.environment
   region        = var.region
-  ip_cidr_range = "10.0.0.0/16"
+  ip_cidr_range = "10.1.0.0/16"
   project_id    = var.project_id
 }
 
@@ -35,7 +35,7 @@ module "frontend_service" {
   region                                   = var.region
   project_id                               = var.project_id
   vpc_network                              = module.vpc_network
-  ip_range_vpc_connector                   = "10.20.0.0/28"
+  ip_range_vpc_connector                   = "10.8.1.0/28"
   environment                              = var.environment
   project_number                           = var.project_number
   project_service                          = module.project_setup
@@ -53,17 +53,34 @@ module "frontend_service" {
   backend_api_key                          = var.backend_api_key
   owner_private_key                        = var.owner_private_key
   owner_client_id                          = var.owner_client_id
-  domain                                   = "ikhebgeencadeau.nl"
+  domain                                   = "acc.ikhebgeencadeau.nl"
 }
+
+module "backend_service_db" {
+  source                 = "../../modules/cloudsql"
+  name_prefix            = "be-svc-${var.environment}"
+  region                 = var.region
+  project_id             = var.project_id
+  project_service        = module.project_setup
+  project_number         = var.project_number
+  tier                   = "db-f1-micro"
+  instance_name          = "cloud-postgres-instance"
+  vpc_network            = module.vpc_network
+  ip_range_vpc_connector = "10.8.1.16/28"
+}
+
 
 module "backend_service" {
   source                 = "../../modules/api_service"
   name_prefix            = "be-svc-${var.environment}"
   region                 = var.region
   project_id             = var.project_id
-  ip_range_vpc_connector = "10.40.0.0/28"
-  vpc_network            = module.vpc_network
-  environment            = var.environment
   project_number         = var.project_number
   project_service        = module.project_setup
+  environment            = var.environment
+  db_connection          = module.backend_service_db
+  vpc_network            = module.vpc_network
+  ip_range_vpc_connector = "10.8.1.32/28"
+
 }
+

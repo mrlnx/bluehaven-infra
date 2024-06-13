@@ -49,7 +49,7 @@ resource "google_compute_target_https_proxy" "https_proxy" {
   project = var.project_id
   count   = var.environment == "prod" ? 1 : 0
 
-  ssl_certificates = var.ssl_certificates
+  ssl_certificates = [var.ssl_certificates]
 
   url_map = google_compute_url_map.load_balancer_https[0].self_link
 }

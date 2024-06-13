@@ -154,6 +154,7 @@ module "ssl" {
   project_id  = var.project_id
   name_prefix = var.name_prefix
   domains     = ["${var.domain}"]
+  count       = var.environment == "prod" ? 1 : 0
 }
 
 module "loadbalancer" {
@@ -162,7 +163,9 @@ module "loadbalancer" {
   name_prefix      = var.name_prefix
   project_id       = var.project_id
   region           = var.region
-  ssl_certificates = [module.ssl.certificate]
+  ssl_certificates = module.ssl[0].certificate
+  environment      = var.environment
+  count            = var.environment == "prod" ? 1 : 0
 }
 
 module "iap_access" {
