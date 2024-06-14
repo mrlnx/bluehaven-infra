@@ -1,9 +1,13 @@
 # Create service account for frontend application
 resource "google_service_account" "frontend_service_sa" {
   project      = var.project_number
-  account_id   = "${var.name_prefix}-sa"
-  display_name = "${var.name_prefix}-frontend-service account"
-  description  = "Service Account for ${var.name_prefix}-frontend-service Terraform on Cloud Run"
+  account_id   = "${var.name_prefix}-sa-${random_id.account.hex}"
+  display_name = "${var.name_prefix} Frontend Service service account"
+  description  = "Service Account for ${var.name_prefix} Frontend Service Terraform on Cloud Run"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Assign frontend application roles to service account
@@ -23,4 +27,8 @@ resource "google_cloud_run_service_iam_member" "frontend_service_public_access" 
 
   role   = "roles/run.invoker"
   member = "allUsers"
+}
+
+resource "random_id" "account" {
+  byte_length = 3
 }

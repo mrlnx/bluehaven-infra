@@ -1,9 +1,5 @@
 # Create the Cloud SQL instance
-data "google_sql_database_instance" "existing" {
-  count   = var.create_instance ? 1 : 0
-  name    = google_sql_database_instance.cloud_postgres_instance[0].name
-  project = var.project_id
-}
+
 # Create a VPC network peering connection
 resource "google_compute_global_address" "private_postgres_ip_address" {
   name          = "cloud-private-ip-address"
@@ -12,14 +8,17 @@ resource "google_compute_global_address" "private_postgres_ip_address" {
   project       = var.project_id
   prefix_length = 16
   network       = var.vpc_network.id
-  count         = var.create_instance ? 1 : 0
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_service_networking_connection" "private_postgres_vpc_connection" {
   network                 = var.vpc_network.id
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_postgres_ip_address[0].name]
-  count                   = var.create_instance ? 1 : 0
+  reserved_peering_ranges = [data.google_compute_global_address.existing_global_address[0].name]
+  depends_on              = [google_compute_global_address.private_postgres_ip_address]
 }
 
 # Create a Cloud SQL instance
@@ -28,7 +27,6 @@ resource "google_sql_database_instance" "cloud_postgres_instance" {
   region           = var.region
   database_version = "POSTGRES_14"
   project          = var.project_id
-
   settings {
     tier = var.tier
 
@@ -44,12 +42,11 @@ resource "google_sql_database_instance" "cloud_postgres_instance" {
 
   deletion_protection = false
   depends_on          = [google_service_networking_connection.private_postgres_vpc_connection]
-  count               = var.create_instance ? 1 : 0
 }
 
 # Create a database for the API service
 resource "google_sql_database" "api_service_db" {
-  name     = var.database
+  name     = "${var.name_prefix}-db"
   instance = var.instance_name
   project  = var.project_id
 }
@@ -64,7 +61,19 @@ resource "google_sql_user" "api_service_db_user" {
   lifecycle {
     ignore_changes = [password]
   }
+
+  depends_on = [google_sql_database_instance.cloud_postgres_instance]
 }
+
+module "vpc_connector" {
+  source        = "../vpc_connector"
+  name_prefix   = var.name_prefix
+  region        = var.region
+  ip_cidr_range = var.ip_range_vpc_connector
+  network       = var.vpc_network
+  project_id    = var.project_id
+}
+
 
 resource "random_password" "password" {
   length           = 16

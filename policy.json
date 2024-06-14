@@ -1,0 +1,19 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "serviceAccount:bluehaven-infra-env-tf-sa@bluehaven-infra-env.iam.gserviceaccount.com",
+        "user:aussieliferight@gmail.com"
+      ],
+      "role": "roles/iam.serviceAccountAdmin"
+    },
+    {
+      "members": [
+        "serviceAccount:bluehaven-infra-env-tf-sa@bluehaven-infra-env.iam.gserviceaccount.com",
+        "user:aussieliferight@gmail.com"
+      ],
+      "role": "roles/iam.serviceAccountTokenCreator"
+    }
+  ],
+  "etag": "ACAB"
+}

@@ -15,7 +15,6 @@ variable "name_prefix" {
 
 variable "environment" {
   description = "Environment"
-  default     = "prod"
 }
 
 variable "service" {

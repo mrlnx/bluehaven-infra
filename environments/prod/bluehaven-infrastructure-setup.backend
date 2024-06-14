@@ -1,0 +1,3 @@
+bucket                      = "bluehaven-new-infra-7-tf-state"
+prefix                      = "static.tfstate.d"
+impersonate_service_account = "bluehaven-new-infra-7-tf-sa@bluehaven-new-infra-7.iam.gserviceaccount.com"
