@@ -27,16 +27,6 @@ variable "instance_name" {
   type        = string
 }
 
-variable "create_instance" {
-  description = "Flag to create the Cloud SQL instance"
-  type        = bool
-}
-
-variable "database" {
-  description = "Databases of service"
-  type        = string
-}
-
 variable "users" {
   description = "Map of database users and passwords"
   type        = map(string)
@@ -47,7 +37,7 @@ variable "backend_db_roles_list" {
   description = "List of all roles to be assigned to the backend database service account"
   type        = list(string)
   default = [
-    "roles/cloudsql.client",
+    "roles/cloudsql.admin",
     "roles/cloudsql.instanceUser"
   ]
 }
@@ -60,3 +50,12 @@ variable "project_number" {
 variable "project_service" {
 
 }
+
+variable "ip_range_vpc_connector" {
+  description = "The IP CIDR range for the VPC connector."
+}
+
+variable "vpc_subnet" {
+
+}
+

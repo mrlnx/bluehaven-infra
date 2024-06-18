@@ -24,3 +24,7 @@ variable "service" {
 
 variable "ssl_certificates" {
 }
+
+variable "security" {
+
+}

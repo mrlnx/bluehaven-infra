@@ -64,3 +64,8 @@ variable "ip_range_vpc_connector" {
 variable "vpc_network" {
   description = "The VPC network the cloudrun container belongs to"
 }
+
+variable "ingress" {
+  description = "Annotation for ignress"
+  default     = "internal-and-cloud-load-balancing"
+}

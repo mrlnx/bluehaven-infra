@@ -1,10 +1,3 @@
-module "artifact_repository" {
-  source      = "../artifacts"
-  name_prefix = var.name_prefix
-  project_id  = var.project_id
-  region      = var.region
-}
-
 module "api_service" {
   # recourse data
   source      = "../cloudrun"
@@ -13,8 +6,8 @@ module "api_service" {
   name_prefix = var.name_prefix
 
   # template metadata annotations
-  max_scale                          = var.max_scale                         # optional
-  cloud_sql_instance_connection_name = module.api_service_db.connection_name # optional
+  max_scale                          = var.max_scale
+  cloud_sql_instance_connection_name = var.db_connection.connection_name
 
   # service accounts
   service_account_email = google_service_account.api_service_sa.email
@@ -65,24 +58,4 @@ module "api_service" {
   # VPC connector
   ip_range_vpc_connector = var.ip_range_vpc_connector
   vpc_network            = var.vpc_network
-}
-
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-module "api_service_db" {
-  source          = "../cloudsql"
-  project_id      = var.project_id
-  name_prefix     = var.name_prefix
-  tier            = "db-f1-micro"
-  region          = var.region
-  vpc_network     = var.vpc_network
-  instance_name   = "cloud-postgres-instance"
-  create_instance = var.create_instance
-  database        = "${var.name_prefix}-db"
-  project_number  = var.project_number
-  project_service = var.project_service
 }

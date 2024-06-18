@@ -6,7 +6,7 @@ resource "google_cloud_run_service" "default" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
+      "run.googleapis.com/ingress" = var.ingress
     }
   }
 
