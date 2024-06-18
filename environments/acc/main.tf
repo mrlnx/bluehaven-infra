@@ -65,6 +65,7 @@ module "frontend_service" {
   owner_private_key                        = var.owner_private_key
   owner_client_id                          = var.owner_client_id
   domain                                   = "acc.ikhebgeencadeau.nl"
+  image                                    = var.fe_docker_image
 
   base_ip_policy = []
 }
@@ -96,4 +97,5 @@ module "backend_service" {
   db_connection          = module.backend_service_db
   vpc_network            = module.vpc_network
   ip_range_vpc_connector = "10.8.1.32/28"
+  image                  = var.be_docker_image
 }
