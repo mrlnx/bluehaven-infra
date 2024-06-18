@@ -98,3 +98,11 @@ variable "oauth_client_id" {
 
 variable "oauth_client_secret" {
 }
+
+variable "fe_docker_image" {
+  default = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+}
+
+variable "be_docker_image" {
+  default = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+}

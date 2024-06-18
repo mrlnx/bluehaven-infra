@@ -32,3 +32,7 @@ https://gcloud.devoteam.com/blog/a-step-by-step-guide-to-set-up-a-gcp-project-to
 ```
 terraform import module.backend_service_db.google_compute_global_address.private_postgres_ip_address projects/bluehaven-infra-env/global/addresses/cloud-private-ip-address
 ```
+
+### First deployment
+
+With the first deployment the variables fe_docker_image and be_docker_unage should be commented, after deployment they need to be uncommented so it will always use the last docker images, instead of the default
