@@ -4,6 +4,12 @@ resource "google_service_account" "api_service_sa" {
   account_id   = "${var.name_prefix}-api-sa"
   display_name = "${var.name_prefix}-api-sa service account"
   description  = "Service Account for ${var.name_prefix}-api-sa Terraform on Cloud Run"
+
+  lifecycle {
+    ignore_changes = [
+      project,
+    ]
+  }
 }
 
 

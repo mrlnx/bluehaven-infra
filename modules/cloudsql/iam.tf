@@ -3,6 +3,12 @@ resource "google_service_account" "api_db_sa" {
   account_id   = "${var.name_prefix}-api-db-sa"
   display_name = "Backend database service account"
   description  = "Service Account for the backend database Terraform on Cloud Run"
+
+  lifecycle {
+    ignore_changes = [
+      project,
+    ]
+  }
 }
 
 # Assign backend database roles to service account

@@ -170,4 +170,16 @@ variable "project_number" {
   type        = string
 }
 
-variable "domain" {}
+variable "domain" {
+  type = string
+
+}
+
+variable "ingress_control" {
+  description = "Annotation for ignress"
+  default     = "internal-and-cloud-load-balancing"
+}
+
+variable "base_ip_policy" {
+  type = list(string)
+}

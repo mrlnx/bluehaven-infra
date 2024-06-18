@@ -45,21 +45,7 @@ variable "project_number" {
   type        = string
 }
 
-# list of roles to be assigned to the build service account
-variable "build_roles_list" {
-  description = "List of all roles to be assigned to the build service account"
-  type        = list(string)
-  default = [
-    "roles/run.developer",
-    "roles/vpcaccess.user",
-    "roles/iam.serviceAccountUser",
-    "roles/run.admin",
-    "roles/secretmanager.secretAccessor",
-    "roles/artifactregistry.admin",
-    "roles/cloudsql.client",
-  ]
-}
-
-locals {
-  sabuild = "${var.project_number}@cloudbuild.gserviceaccount.com"
+variable "name_prefix" {
+  description = "Prefix name of the api service"
+  type        = string
 }

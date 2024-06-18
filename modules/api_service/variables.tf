@@ -63,7 +63,7 @@ variable "environment" {
 
 locals {
   description  = "URL of the backend database"
-  database_url = "postgres://${module.api_service_db.user}:${module.api_service_db.password}@${module.api_service_db.private_ip_address}/${module.api_service_db.service_name}?sslaccept=strict&connect_timeout=300&host=/cloudsql/${var.project_id}:${var.region}:${module.api_service_db.instance_name}"
+  database_url = "postgres://${var.db_connection.user}:${var.db_connection.password}@${var.db_connection.private_ip_address}/${var.db_connection.service_name}?sslaccept=strict&connect_timeout=300&host=/cloudsql/${var.project_id}:${var.region}:${var.db_connection.instance_name}"
 }
 
 variable "backend_roles_list" {
@@ -74,7 +74,8 @@ variable "backend_roles_list" {
     "roles/secretmanager.secretAccessor",
     "roles/cloudsql.client",
     "roles/cloudsql.instanceUser",
-    "roles/cloudsql.viewer"
+    "roles/cloudsql.viewer",
+    "roles/cloudsql.admin"
   ]
 }
 
@@ -87,9 +88,4 @@ variable "project_service" {
 
 }
 
-# Define a manual flag to control instance creation
-variable "create_instance" {
-  description = "Flag to control if Cloud SQL instance should be created"
-  type        = bool
-  default     = true
-}
+variable "db_connection" {}

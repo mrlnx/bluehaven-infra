@@ -4,13 +4,15 @@ set -e
 
 # Initialize variables
 PROJECT_ID=""
+EMAIL=""
 
 # Help function
 print_help() {
-    echo "Usage: $0 --project=<project>"
+    echo "Usage: $0 --project=<project> --email=<email>"
     echo
     echo "Options:"
     echo "  --project=<project>  Specify the project name"
+    echo "  --email=<email>      Specify the email address"
     echo "  -h, --help           Show this help message"
 }
 
@@ -23,14 +25,21 @@ fi
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --project=*) PROJECT_ID="${1#*=}"; shift ;;
+        --email=*) EMAIL="${1#*=}"; shift ;;
         -h|--help) print_help; exit 0 ;;
         *) echo "Unknown parameter passed: $1"; print_help; exit 1 ;;
     esac
 done
 
-# Check if project variable is set
+# Check if project and email variables are set
 if [ -z "$PROJECT_ID" ]; then
     echo "Error: --project argument is required."
+    print_help
+    exit 1
+fi
+
+if [ -z "$EMAIL" ]; then
+    echo "Error: --email argument is required."
     print_help
     exit 1
 fi
@@ -38,8 +47,14 @@ fi
 # Set project ID
 SERVICE_ACCOUNT="$PROJECT_ID-tf-sa@$PROJECT_ID.iam.gserviceaccount.com"
 
-# Create a new project
-gcloud projects create "$PROJECT_ID"
+# Check if the project exists
+if gcloud projects describe "$PROJECT_ID" > /dev/null 2>&1; then
+    echo "Project $PROJECT_ID already exists."
+else
+    # Create the project if it does not exist
+    gcloud projects create "$PROJECT_ID"
+    echo "Project $PROJECT_ID has been created."
+fi
 
 # Authenticate gcloud
 gcloud auth application-default login
@@ -79,14 +94,14 @@ cat <<EOF > policy.json
     {
       "members": [
         "serviceAccount:$SERVICE_ACCOUNT",
-        "user:marbildokaus@gmail.com"
+        "user:$EMAIL"
       ],
       "role": "roles/iam.serviceAccountAdmin"
     },
     {
       "members": [
         "serviceAccount:$SERVICE_ACCOUNT",
-        "user:marbildokaus@gmail.com"
+        "user:$EMAIL"
       ],
       "role": "roles/iam.serviceAccountTokenCreator"
     }
@@ -108,9 +123,27 @@ fi
 
 gcloud billing projects link "$PROJECT_ID" --billing-account="$BILLING_ACCOUNT"
 
-# create bucket in storage
-gsutil mb gs://$PROJECT_ID-tf-state
-gsutil versioning set on gs://$PROJECT_ID-tf-state
+# Check if the bucket exists
+BUCKET_NAME="gs://$PROJECT_ID-tf-state"
+if gsutil ls "$BUCKET_NAME" > /dev/null 2>&1; then
+    echo "Bucket $BUCKET_NAME already exists."
+else
+    # Create the bucket if it does not exist
+    gsutil mb "$BUCKET_NAME"
+    gsutil versioning set on "$BUCKET_NAME"
+    echo "Bucket $BUCKET_NAME has been created and versioning is enabled."
+fi
+
+LOGS_BUCKET_NAME="gs://${PROJECT_ID}_logs"
+
+if gsutil ls "$LOGS_BUCKET_NAME" > /dev/null 2>&1; then
+    echo "Bucket $LOGS_BUCKET_NAME already exists."
+else
+    # Create the bucket if it does not exist
+    gsutil mb -p "$PROJECT_ID" "$LOGS_BUCKET_NAME"
+    gsutil versioning set on "$LOGS_BUCKET_NAME"
+    echo "Bucket log $LOGS_BUCKET_NAME has been created and versioning is enabled."
+fi
 
 # enable services
 gcloud services enable iamcredentials.googleapis.com \

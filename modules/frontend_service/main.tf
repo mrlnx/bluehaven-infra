@@ -5,6 +5,8 @@ module "frontend_service" {
   project_id  = var.project_id
   name_prefix = var.name_prefix
 
+  ingress = var.ingress_control
+
   # template metadata annotations
   max_scale = var.max_scale # optional
 
@@ -154,6 +156,15 @@ module "ssl" {
   project_id  = var.project_id
   name_prefix = var.name_prefix
   domains     = ["${var.domain}"]
+  # count       = var.environment == "prod" ? 1 : 0
+}
+
+module "security" {
+  source         = "../security"
+  project_id     = var.project_id
+  name_prefix    = var.name_prefix
+  base_ip_policy = var.base_ip_policy
+  count          = length(var.base_ip_policy) > 0 ? 1 : 0
 }
 
 module "loadbalancer" {
@@ -162,14 +173,8 @@ module "loadbalancer" {
   name_prefix      = var.name_prefix
   project_id       = var.project_id
   region           = var.region
-  ssl_certificates = [module.ssl.certificate]
-}
-
-module "iap_access" {
-  source      = "../iap"
-  count       = contains(["stag", "acc"], var.environment) ? 1 : 0
-  project_id  = var.project_id
-  domain      = "${var.environment}.${var.domain}"
-  service     = module.frontend_service
-  environment = var.environment
+  ssl_certificates = module.ssl.certificate
+  environment      = var.environment
+  security         = module.security
+  # count            = var.environment == "prod" ? 1 : 0
 }

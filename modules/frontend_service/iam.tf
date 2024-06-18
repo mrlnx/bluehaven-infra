@@ -4,6 +4,12 @@ resource "google_service_account" "frontend_service_sa" {
   account_id   = "${var.name_prefix}-sa"
   display_name = "${var.name_prefix}-frontend-service account"
   description  = "Service Account for ${var.name_prefix}-frontend-service Terraform on Cloud Run"
+
+  lifecycle {
+    ignore_changes = [
+      project,
+    ]
+  }
 }
 
 # Assign frontend application roles to service account
